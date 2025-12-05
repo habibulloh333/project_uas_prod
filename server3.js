@@ -44,7 +44,7 @@ const formatProductResponse = (dbProduct) => ({
     pricing: {
         base_price: dbProduct.base_price,
         tax: dbProduct.tax,
-        harga_final: dbProduct.harga_final // Perhitungan final
+        harga_final: dbProduct.harga_final 
     },
     stock: dbProduct.stock,
     created_by: dbProduct.created_by,
@@ -172,7 +172,7 @@ app.get('/products/:id', async (req, res) => {
     }
 });
 
-// CREATE Product (Protected - User atau Admin)
+// CREATE Product User atau Admin
 app.post('/products', authenticateToken, async (req, res) => {
     const { name, category, base_price, tax, stock } = req.body;
 
@@ -201,7 +201,7 @@ app.post('/products', authenticateToken, async (req, res) => {
     }
 });
 
-// UPDATE Product (Protected - Hanya ADMIN)
+// UPDATE Product Hanya ADMIN
 app.put('/products/:id', [authenticateToken, authorizeRole('admin')], async (req, res) => {
     const productId = req.params.id;
     const { name, category, base_price, tax, stock } = req.body;
@@ -248,7 +248,7 @@ app.put('/products/:id', [authenticateToken, authorizeRole('admin')], async (req
     }
 });
 
-// DELETE Product (Protected - Hanya ADMIN)
+// DELETE Product Hanya ADMIN
 app.delete('/products/:id', [authenticateToken, authorizeRole('admin')], async (req, res) => {
     const productId = req.params.id;
 
@@ -270,19 +270,15 @@ app.delete('/products/:id', [authenticateToken, authorizeRole('admin')], async (
 });
 
 // ERROR HANDLING & START SERVER
-
-// 404 Handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint tidak ditemukan' });
 });
 
-// Global Error Handler
 app.use((err, req, res, next) => {
     console.error('[SERVER ERROR]', err.stack);
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n🚀 server 3 API berjalan di http://localhost:${PORT}`);
-    console.log("---------------------------------------------------------------");
+    console.log(`server 3 API berjalan di http://localhost:${PORT}`);
 });

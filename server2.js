@@ -93,9 +93,8 @@ app.post('/auth/login', async (req, res, next) => {
   }
 });
 
-/* =============================================================
-   GET ALL PRODUCTS (Vendor B)
-============================================================= */
+
+//GET ALL PRODUCTS (Vendor B)
 app.get('/vendor-b/fashion', async (req, res, next) => {
   const sql = `
     SELECT 
@@ -116,9 +115,8 @@ app.get('/vendor-b/fashion', async (req, res, next) => {
   }
 });
 
-/* =============================================================
-   GET PRODUCT BY SKU
-============================================================= */
+
+//GET PRODUCT BY SKU
 app.get('/vendor-b/fashion/:sku', async (req, res, next) => {
   const sql = `
     SELECT 
@@ -142,9 +140,7 @@ app.get('/vendor-b/fashion/:sku', async (req, res, next) => {
   }
 });
 
-/* =============================================================
-   CREATE PRODUCT (menggunakan SKU sebagai primary unique key)
-============================================================= */
+  //CREATE PRODUCT (menggunakan SKU sebagai primary unique key)
 app.post('/vendor-b/fashion', authenticateToken, async (req, res, next) => {
   const { sku, productName, price, isAvailable } = req.body;
 
@@ -182,9 +178,8 @@ app.post('/vendor-b/fashion', authenticateToken, async (req, res, next) => {
   }
 });
 
-/* =============================================================
-   UPDATE PRODUCT by SKU
-============================================================= */
+
+//UPDATE PRODUCT by SKU
 app.put('/vendor-b/fashion/:sku',
   authenticateToken,
   authorizeRole('admin'),
@@ -217,9 +212,8 @@ app.put('/vendor-b/fashion/:sku',
     }
 });
 
-/* =============================================================
-   DELETE PRODUCT by SKU
-============================================================= */
+
+//DELETE PRODUCT by SKU
 app.delete('/vendor-b/fashion/:sku',
   authenticateToken,
   authorizeRole('admin'),
@@ -240,7 +234,7 @@ app.delete('/vendor-b/fashion/:sku',
     }
 });
 
-// === FALLBACK & ERROR HANDLING ===
+//FALLBACK & ERROR HANDLING 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route tidak ditemukan' });
 });
@@ -250,7 +244,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Terjadi kesalahan pada server' });
 });
 
-// === START SERVER ===
+// START SERVER 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server aktif di http://localhost:${PORT}`);
 });
