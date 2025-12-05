@@ -475,9 +475,11 @@ const formatProductResponse = (dbProduct) => ({
 });
 
 // GET All Products (Public)
+
+// GET All Products (Public)
 app.get('/products', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM products ORDER BY id ASC'); 
+        const result = await db.query('SELECT * FROM products ORDER BY id ASC'); 
         const formattedProducts = result.rows.map(formatProductResponse);
 
         res.json({
@@ -494,7 +496,7 @@ app.get('/products', async (req, res) => {
 app.get('/products/:id', async (req, res) => {
     const productId = req.params.id;
     try {
-        const result = await pool.query('SELECT * FROM products WHERE id = $1', [productId]);
+        const result = await db.query('SELECT * FROM products WHERE id = $1', [productId]);
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Produk tidak ditemukan' });
         }
@@ -504,7 +506,7 @@ app.get('/products/:id', async (req, res) => {
     }
 });
 
-// CREATE Product User atau Admin
+// CREATE Product
 app.post('/products', authenticateToken, async (req, res) => {
     const { name, category, base_price, tax, stock } = req.body;
 
@@ -521,7 +523,7 @@ app.post('/products', authenticateToken, async (req, res) => {
             RETURNING *
         `;
         const values = [name, category, base_price, tax, stock, harga_final, req.user.username];
-        const result = await pool.query(query, values);
+        const result = await db.query(query, values); // <-- Gunakan db.query()
 
         res.status(201).json({
             success: true,
@@ -529,17 +531,17 @@ app.post('/products', authenticateToken, async (req, res) => {
             data: formatProductResponse(result.rows[0])
         });
     } catch (err) {
-        res.status(500).json({ error: 'Gagal membuat produk di database Neon: ' + err.message });
+        res.status(500).json({ error: 'Gagal membuat produk: ' + err.message });
     }
 });
 
-// UPDATE Product Hanya ADMIN
+// UPDATE Product
 app.put('/products/:id', [authenticateToken, authorizeRole('admin')], async (req, res) => {
     const productId = req.params.id;
     const { name, category, base_price, tax, stock } = req.body;
     
     try {
-        const existingProductResult = await pool.query('SELECT * FROM products WHERE id = $1', [productId]);
+        const existingProductResult = await db.query('SELECT * FROM products WHERE id = $1', [productId]);
         
         if (existingProductResult.rows.length === 0) {
             return res.status(404).json({ error: 'Produk tidak ditemukan' });
@@ -568,7 +570,7 @@ app.put('/products/:id', [authenticateToken, authorizeRole('admin')], async (req
             productId
         ];
         
-        const result = await pool.query(query, values);
+        const result = await db.query(query, values); // <-- Gunakan db.query()
 
         res.json({
             success: true,
@@ -576,16 +578,16 @@ app.put('/products/:id', [authenticateToken, authorizeRole('admin')], async (req
             data: formatProductResponse(result.rows[0])
         });
     } catch (err) {
-        res.status(500).json({ error: 'Gagal mengupdate produk di database Neon: ' + err.message });
+        res.status(500).json({ error: 'Gagal mengupdate produk: ' + err.message });
     }
 });
 
-// DELETE Product Hanya ADMIN
+// DELETE Product
 app.delete('/products/:id', [authenticateToken, authorizeRole('admin')], async (req, res) => {
     const productId = req.params.id;
 
     try {
-        const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [productId]);
+        const result = await db.query('DELETE FROM products WHERE id = $1 RETURNING *', [productId]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Produk tidak ditemukan' });
@@ -597,11 +599,9 @@ app.delete('/products/:id', [authenticateToken, authorizeRole('admin')], async (
             deleted_product: formatProductResponse(result.rows[0])
         });
     } catch (err) {
-        res.status(500).json({ error: 'Gagal menghapus produk dari database Neon: ' + err.message });
+        res.status(500).json({ error: 'Gagal menghapus produk: ' + err.message });
     }
 });
-
-
 /* ============================================
    FORMATTER – Menyamakan format semua vendor
    + Tambahan Logika Validasi
