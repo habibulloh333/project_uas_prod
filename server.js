@@ -98,7 +98,7 @@ app.post("/auth/login", async (req, res, next) => {
 
 // VENDOR A
 
-pp.get("/api/vendor-a/products", async (req, res, next) => {
+app.get("/api/vendor-a/products", async (req, res, next) => {
   console.log("[GET /api/vendor-a/products] Fetching all products from DB");
   const sql =
     "SELECT kd_produk, nm_brg, hrg, ket_stok FROM vendor_a_products ORDER BY kd_produk ASC";
